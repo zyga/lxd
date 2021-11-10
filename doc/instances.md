@@ -826,6 +826,8 @@ Key         | Type      | Default           | Required  | Description
 :--         | :--       | :--               | :--       | :--
 vendorid    | string    | -                 | no        | The vendor id of the USB device
 productid   | string    | -                 | no        | The product id of the USB device
+busnum      | string    | -                 | no        | The USB bus number
+devnum      | string    | -                 | no        | The USB device number on the specific bus
 uid         | int       | 0                 | no        | UID of the device owner in the instance
 gid         | int       | 0                 | no        | GID of the device owner in the instance
 mode        | int       | 0660              | no        | Mode of the device in the instance

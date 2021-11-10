@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 
 	deviceConfig "github.com/lxc/lxd/lxd/device/config"
@@ -25,6 +26,18 @@ func usbIsOurDevice(config deviceConfig.Device, usb *USBEvent) bool {
 	// Check if event matches criteria for this device, if not return.
 	if (config["vendorid"] != "" && config["vendorid"] != usb.Vendor) || (config["productid"] != "" && config["productid"] != usb.Product) {
 		return false
+	}
+
+	// Optionally, match on bus number and device number as well. Since device
+	// numbers are local to a bus, devnum is only checked if busnum is not
+	// empty.
+	if busnum := config["busnum"]; busnum != "" {
+		if busnum != strconv.Itoa(usb.BusNum) {
+			return false
+		}
+		if devnum := config["devnum"]; devnum != "" && devnum != strconv.Itoa(usb.DevNum) {
+			return false
+		}
 	}
 
 	return true
@@ -57,6 +70,8 @@ func (d *usb) validateConfig(instConf instance.ConfigReader) error {
 	rules := map[string]func(string) error{
 		"vendorid":  validate.Optional(validate.IsDeviceID),
 		"productid": validate.Optional(validate.IsDeviceID),
+		"busnum":    validate.Optional(validate.IsUint8),
+		"devnum":    validate.Optional(validate.IsUint8),
 		"uid":       unixValidUserID,
 		"gid":       unixValidUserID,
 		"mode":      unixValidOctalFileMode,
